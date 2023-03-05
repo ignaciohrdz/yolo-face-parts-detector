@@ -1,0 +1,4 @@
+.idea
+runs/
+weights/
+__pycache__/
