@@ -1,4 +1,4 @@
-# Face parts detection with YOLOv8 👁👃👄👂
+# Face parts detection with YOLOv8 👃
 
 ## Introduction
 

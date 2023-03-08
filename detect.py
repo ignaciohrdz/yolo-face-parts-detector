@@ -1,9 +1,5 @@
 from ultralytics import YOLO
-from pathlib import Path
 import os
-import cv2
-from prepare_data import smart_resize
-
 
 if __name__ == "__main__":
 

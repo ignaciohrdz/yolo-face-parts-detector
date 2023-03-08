@@ -1,13 +1,11 @@
 from ultralytics import YOLO
-from pathlib import Path
 import os
-import cv2
-from prepare_data import smart_resize
+from utils import *
 
 
 if __name__ == "__main__":
 
-    path_dataset = os.path.join(Path.home(), "Documents", "Datasets", "Face-Parts-Dataset")
+    path_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Face-Parts-Dataset")
     path_yaml = os.path.join(path_dataset, "split", "data.yaml")
 
     # Creating the model

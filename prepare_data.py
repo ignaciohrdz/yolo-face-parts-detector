@@ -6,23 +6,16 @@ The output of this code is a folder with everything needed to train a YOLOv8 mod
 Author: Ignacio Hernández Montilla, 2023
 """
 
-from pathlib import Path
-import os
+from utils import *
 import shutil
 import glob
 
-import cv2
 import pandas as pd
-import numpy as np
+import os
 import yaml
 
 import random
 random.seed(420)
-
-
-def smart_resize(img, new_size=512):
-    ratio = new_size/max(img.shape[:2])
-    return cv2.resize(img, None, fx=ratio, fy=ratio), ratio
 
 
 def process_names(names, split, path_data, path_dest, skip):
@@ -51,23 +44,23 @@ if __name__ == "__main__":
     IMSHOW_WAIT_TIME = 33  # for cv2.imshow
 
     # Original data from Helen
-    path_helen_dataset = os.path.join(Path.home(), "Documents", "Datasets", "Helen-dataset")
+    path_helen_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Helen-dataset")
     path_helen_images = os.path.join(path_helen_dataset, "images")
     path_helen_annotations = os.path.join(path_helen_dataset, "annotation")
 
     # Original data from Pexels
-    path_pexels_dataset = os.path.join(Path.home(), "Documents", "Datasets", "Pexels-face-parts")
+    path_pexels_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Pexels-face-parts")
     path_pexels_images = os.path.join(path_pexels_dataset, "images")
     path_pexels_annotations = os.path.join(path_pexels_dataset, "annotations", "obj_train_data")
 
     # Original data from the AFW dataset
-    path_afw_dataset = os.path.join(Path.home(), "Documents", "Datasets", "AFW-dataset")
+    path_afw_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "AFW-dataset")
 
     # Original data from the Menpo2D dataset
-    path_menpo2D_dataset = os.path.join(Path.home(), "Documents", "Datasets", "Menpo2D")
+    path_menpo2D_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Menpo2D")
 
     # The results will go here
-    path_processed_dataset = Path(os.path.join(Path.home(), "Documents", "Datasets", "Face-Parts-Dataset"))
+    path_processed_dataset = Path(os.path.join(PATH_HOME, "Documents", "Datasets", "Face-Parts-Dataset"))
     path_processed_images = Path(os.path.join(path_processed_dataset, "images"))
     path_processed_labels = Path(os.path.join(path_processed_dataset, "labels"))
     path_yolo_data = Path(os.path.join(path_processed_dataset, "split"))
@@ -141,14 +134,7 @@ if __name__ == "__main__":
                         img = cv2.circle(img, (int(x*ratio), int(y*ratio)), 3, (0, 255, 255), -1)
 
                     # Getting the bounding box in YOLO format
-                    contour = np.array(contour, dtype=np.int32)
-                    x, y, w, h = cv2.boundingRect(contour)
-                    x_n, w_n = x/img_w, w/img_w
-                    y_n, h_n = y/img_h, h/img_h
-                    x_c = x_n + 0.5*w_n
-                    y_c = y_n + 0.5*h_n
-                    # Populating the dataframe
-                    img_labels.loc[len(img_labels), :] = [part_id, x_c, y_c, w_n, h_n]
+                    x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
 
                     img = cv2.rectangle(img,
                                         (int(x*ratio), int(y*ratio)),
@@ -164,7 +150,10 @@ if __name__ == "__main__":
             label_dest = os.path.join(path_processed_labels, os.path.splitext(img_name)[0] + ".txt")
             img_labels.round(6).to_csv(label_dest, header=False, index=False, sep=" ")
 
-    # PART 2: PROCESSING THE PEXELS IMAGES
+    ########################################
+    # PART 2: PROCESSING THE PEXELS IMAGES #
+    ########################################
+
     # Copying the images and the labels to the final folder
     pexels_labels = os.listdir(path_pexels_annotations)
     for l in pexels_labels:
@@ -188,6 +177,7 @@ if __name__ == "__main__":
     ###################################################################
     # PART 3: PROCESSING THE AFW IMAGES (Annotated Faces in the Wild) #
     ###################################################################
+
     # Make train/val splits
     afw_images = glob.glob(os.path.join(path_afw_dataset, "*.jpg"))
     afw_names = list(set([os.path.basename(f).split("_")[0] for f in afw_images]))  # removes duplicates
@@ -239,20 +229,12 @@ if __name__ == "__main__":
                         img = cv2.circle(img, (int(x * ratio), int(y * ratio)), 3, (0, 255, 255), -1)
 
                     # Getting the bounding box in YOLO format
-                    contour = np.array(contour, dtype=np.int32)
-                    x, y, w, h = cv2.boundingRect(contour)
-                    x_n, w_n = x / img_w, w / img_w
-                    y_n, h_n = y / img_h, h / img_h
-                    x_c = x_n + 0.5 * w_n
-                    y_c = y_n + 0.5 * h_n
-
-                    # Populating the dataframe
-                    img_labels.loc[len(img_labels), :] = [part_id, x_c, y_c, w_n, h_n]
+                    x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
 
                     # Showing the box
                     img = cv2.rectangle(img,
-                                        (int(x * ratio), int(y * ratio)),
-                                        (int((x + w) * ratio), int((y + h) * ratio)), (0, 0, 255), 2)
+                                        (int(x*ratio), int(y*ratio)),
+                                        (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
 
             cv2.imshow("Image", img)
             cv2.waitKey(IMSHOW_WAIT_TIME)
@@ -326,20 +308,12 @@ if __name__ == "__main__":
                         img = cv2.circle(img, (int(x * ratio), int(y * ratio)), 3, (0, 255, 255), -1)
 
                     # Getting the bounding box in YOLO format
-                    contour = np.array(contour, dtype=np.int32)
-                    x, y, w, h = cv2.boundingRect(contour)
-                    x_n, w_n = x / img_w, w / img_w
-                    y_n, h_n = y / img_h, h / img_h
-                    x_c = x_n + 0.5 * w_n
-                    y_c = y_n + 0.5 * h_n
-
-                    # Populating the dataframe
-                    img_labels.loc[len(img_labels), :] = [part_id, x_c, y_c, w_n, h_n]
+                    x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
 
                     # Showing the box
                     img = cv2.rectangle(img,
-                                        (int(x * ratio), int(y * ratio)),
-                                        (int((x + w) * ratio), int((y + h) * ratio)), (0, 0, 255), 2)
+                                        (int(x*ratio), int(y*ratio)),
+                                        (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
 
             cv2.imshow("Image", img)
             cv2.waitKey(IMSHOW_WAIT_TIME)
