@@ -21,6 +21,12 @@ For this experiment I'm using the following sources:
 
 ### Data quality
 
-Some datasets such as Helen may generate noisy examples when the images have more than one face but only one set of landmarks (i.e. the ones corresponding to the "main" face in the image).This is probably affecting the precision because the model is actually detecting all the faces in these images (which is good, though). Other datasets such as AFW have as many landmarks as faces in the images.
+Some datasets such as Helen may generate noisy examples when the images have more than one face but only one set of landmarks (i.e. the ones corresponding to the "main" face in the image). This is probably affecting the precision because the model is actually detecting all the faces in these images (which is good, though). Other datasets such as AFW have as many landmarks as faces in the images.
 
 ![A training batch with some images with incomplete labels](images/example_incomplete_labels.jpg)
+
+### Performance
+
+The model I've trained (nano) struggles with eyebrows, but it works really well on eyes and noses.
+
+![F1 curve](images/F1_curve.png)
