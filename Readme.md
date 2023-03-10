@@ -15,7 +15,7 @@ For this experiment I'm using the following sources:
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
   - [AFW (Annotated Faces in the Wild)](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
 - Custom datasets:
-  - [Pexels](https://pexels.com): I downloaded 85 images from this website and annotated them using [CVAT](https://app.cvat.ai/).
+  - [Pexels](https://pexels.com): I downloaded 85 images from this website and annotated them using [CVAT](https://app.cvat.ai/). I am currently working on another batch of images.
 
 ## Results
 

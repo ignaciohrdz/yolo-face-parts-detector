@@ -12,11 +12,11 @@ if __name__ == "__main__":
     model = YOLO(os.path.join(path_model, "best.pt"))
 
     # This will draw the detections
-    class_colors = spv.ColorPalette.from_hex(['#990099', '#ff66ff', '#00cc00', '#cc0000'])
+    class_colors = spv.ColorPalette.from_hex(['#ffff66', '#66ffcc', '#ff99ff', '#ffcc99'])
     box_annotator = spv.BoxAnnotator(
         thickness=2,
-        text_thickness=2,
-        text_scale=1,
+        text_thickness=1,
+        text_scale=0.5,
         color=class_colors
     )
 
@@ -45,4 +45,3 @@ if __name__ == "__main__":
 
         if k == ord("q"):
             break
-

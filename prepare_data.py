@@ -154,6 +154,8 @@ if __name__ == "__main__":
     # PART 2: PROCESSING THE PEXELS IMAGES #
     ########################################
 
+    # TODO: Add the images of the new batch
+
     # Copying the images and the labels to the final folder
     pexels_labels = os.listdir(path_pexels_annotations)
     for l in pexels_labels:
