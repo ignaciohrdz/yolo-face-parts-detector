@@ -15,7 +15,7 @@ For this experiment I'm using the following sources:
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
   - [AFW (Annotated Faces in the Wild)](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
 - Custom datasets:
-  - [Pexels](https://pexels.com): I downloaded 85 images from this website and annotated them using [CVAT](https://app.cvat.ai/). I am currently working on another batch of images.
+  - [Pexels](https://pexels.com): I downloaded 85 images from this website and annotated them using [CVAT](https://app.cvat.ai/). I am currently working on another two batches of images.
 
 ## Results
 
@@ -27,6 +27,6 @@ Some datasets such as Helen may generate noisy examples when the images have mor
 
 ### Performance
 
-The model I've trained (nano) struggles with eyebrows, but it works really well on eyes and noses.
+The model I've trained (nano) struggles with eyebrows, but it works really well on eyes and noses. I need to add more close-up images of each part to increase the number of incomplete faces.
 
 ![F1 curve](images/F1_curve.png)

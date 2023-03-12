@@ -50,8 +50,6 @@ if __name__ == "__main__":
 
     # Original data from Pexels
     path_pexels_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Pexels-face-parts")
-    path_pexels_images = os.path.join(path_pexels_dataset, "images")
-    path_pexels_annotations = os.path.join(path_pexels_dataset, "annotations", "obj_train_data")
 
     # Original data from the AFW dataset
     path_afw_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "AFW-dataset")
@@ -154,23 +152,27 @@ if __name__ == "__main__":
     # PART 2: PROCESSING THE PEXELS IMAGES #
     ########################################
 
-    # TODO: Add the images of the new batch
-
     # Copying the images and the labels to the final folder
-    pexels_labels = os.listdir(path_pexels_annotations)
-    for l in pexels_labels:
-        img_name = os.path.splitext(l)[0] + ".jpg"
-        img_source = os.path.join(path_pexels_images, img_name)
-        img_dest = os.path.join(path_processed_images, img_name)
-        shutil.copy(img_source, img_dest)
+    pexels_sets = os.listdir(path_pexels_dataset)
+    pexels_names = []
+    for s in pexels_sets:
+        path_pexels_annotations = os.path.join(path_pexels_dataset, s, "annotations", "obj_train_data")
+        path_pexels_images = os.path.join(path_pexels_dataset, s, "images")
+        pexels_labels = os.listdir(path_pexels_annotations)
+        pexels_names.extend([os.path.splitext(l)[0] for l in pexels_labels])
 
-        label_source = os.path.join(path_pexels_annotations, l)
-        label_dest = os.path.join(path_processed_labels, l)
-        shutil.copy(label_source, label_dest)
+        for l in pexels_labels:
+            img_name = os.path.splitext(l)[0] + ".jpg"
+            img_source = os.path.join(path_pexels_images, img_name)
+            img_dest = os.path.join(path_processed_images, img_name)
+            shutil.copy(img_source, img_dest)
+
+            label_source = os.path.join(path_pexels_annotations, l)
+            label_dest = os.path.join(path_processed_labels, l)
+            shutil.copy(label_source, label_dest)
 
     # Separate the Helen dataset in training and validation
     train_pct = 0.7
-    pexels_names = [os.path.splitext(l)[0] for l in pexels_labels]
     random.shuffle(pexels_names)
     train_size = int(train_pct*len(pexels_names))
     pexels_train_names = pd.DataFrame({0: pexels_names[:train_size]})
