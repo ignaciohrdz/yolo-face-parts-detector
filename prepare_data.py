@@ -9,6 +9,7 @@ Author: Ignacio Hernández Montilla, 2023
 from utils import *
 import shutil
 import glob
+from unidecode import unidecode
 
 import pandas as pd
 import os
@@ -159,16 +160,19 @@ if __name__ == "__main__":
         path_pexels_annotations = os.path.join(path_pexels_dataset, s, "annotations", "obj_train_data")
         path_pexels_images = os.path.join(path_pexels_dataset, s, "images")
         pexels_labels = os.listdir(path_pexels_annotations)
-        pexels_names.extend([os.path.splitext(l)[0] for l in pexels_labels])
 
         for l in pexels_labels:
+            # Cleaning the names to avoid files with weird accents and characters
+            file_name_cleaned = unidecode(os.path.splitext(l)[0])
+            pexels_names.append(file_name_cleaned)
+
             img_name = os.path.splitext(l)[0] + ".jpg"
             img_source = os.path.join(path_pexels_images, img_name)
-            img_dest = os.path.join(path_processed_images, img_name)
+            img_dest = os.path.join(path_processed_images, file_name_cleaned + ".jpg")
             shutil.copy(img_source, img_dest)
 
             label_source = os.path.join(path_pexels_annotations, l)
-            label_dest = os.path.join(path_processed_labels, l)
+            label_dest = os.path.join(path_processed_labels, file_name_cleaned + ".txt")
             shutil.copy(label_source, label_dest)
 
     # Separate the Helen dataset in training and validation
