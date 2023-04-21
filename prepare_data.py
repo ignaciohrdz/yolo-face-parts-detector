@@ -15,6 +15,8 @@ import pandas as pd
 import os
 import yaml
 
+import argparse
+
 import random
 random.seed(420)
 
@@ -42,24 +44,35 @@ def process_names(names, split, path_data, path_dest, skip):
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", '--data_dir', type=str, help="Path to the folder with all the datasets to be combined")
+    args = parser.parse_args()
+    if args.data_dir is not None:
+        path_datasets = args.data_dir
+    else:
+        path_datasets = os.path.join(PATH_HOME, "Documents", "Datasets")
+
     IMSHOW_WAIT_TIME = 33  # for cv2.imshow
 
     # Original data from Helen
-    path_helen_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Helen-dataset")
+    path_helen_dataset = os.path.join(path_datasets, "Helen-dataset")
     path_helen_images = os.path.join(path_helen_dataset, "images")
     path_helen_annotations = os.path.join(path_helen_dataset, "annotation")
 
     # Original data from Pexels
-    path_pexels_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Pexels-face-parts")
+    path_pexels_dataset = os.path.join(path_datasets, "Pexels-face-parts")
 
     # Original data from the AFW dataset
-    path_afw_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "AFW-dataset")
+    path_afw_dataset = os.path.join(path_datasets, "AFW-dataset")
 
     # Original data from the Menpo2D dataset
-    path_menpo2D_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Menpo2D")
+    path_menpo2D_dataset = os.path.join(path_datasets, "Menpo2D")
+
+    # Original data from the LaPa dataset
+    path_lapa_dataset = os.path.join(path_datasets, "LaPa")
 
     # The results will go here
-    path_processed_dataset = Path(os.path.join(PATH_HOME, "Documents", "Datasets", "Face-Parts-Dataset"))
+    path_processed_dataset = Path(os.path.join(path_datasets, "Face-Parts-Dataset"))
     path_processed_images = Path(os.path.join(path_processed_dataset, "images"))
     path_processed_labels = Path(os.path.join(path_processed_dataset, "labels"))
     path_yolo_data = Path(os.path.join(path_processed_dataset, "split"))
@@ -112,7 +125,7 @@ if __name__ == "__main__":
         img_name = "{}.jpg".format(img_name)
 
         if img_name not in skip_imgs:
-            print("{}: {} landmarks".format(img_name, len(lines)))
+            print("[HELEN] {}: {} landmarks".format(img_name, len(lines)))
 
             img = cv2.imread(os.path.join(path_helen_images, img_name), cv2.IMREAD_COLOR)
             img_h, img_w = img.shape[:2]
@@ -224,7 +237,7 @@ if __name__ == "__main__":
 
                 cv2.imshow("Image", img)
                 cv2.waitKey(IMSHOW_WAIT_TIME)
-                print("{}: {} landmarks".format(n, len(lines)))
+                print("[AFW] {}: {} landmarks".format(n, len(lines)))
 
             img_labels = pd.DataFrame(columns=['class', 'x', 'y', 'w', 'h'])
             for part_id, part_name in enumerate(use_parts):
@@ -302,7 +315,7 @@ if __name__ == "__main__":
 
             cv2.imshow("Image", img)
             cv2.waitKey(IMSHOW_WAIT_TIME)
-            print("{}: {} landmarks".format(os.path.basename(img_path), len(x_points)))
+            print("[Menpo2D] {}: {} landmarks".format(os.path.basename(img_path), len(x_points)))
 
             img_labels = pd.DataFrame(columns=['class', 'x', 'y', 'w', 'h'])
             for part_id, part_name in enumerate(use_parts):
@@ -330,8 +343,80 @@ if __name__ == "__main__":
             label_dest = os.path.join(path_processed_labels, "{}.txt".format(label_name))
             img_labels.round(6).to_csv(label_dest, header=False, index=False, sep=" ")
 
+    ######################################
+    # PART 5: PREPARING THE LAPA DATASET #
+    ######################################
+
+    # Some images of the training set come from other datasets
+    exclude_prefix = ['HELEN_', 'IBUG_', 'AFW_', 'LFPW_']
+    part_points_lapa = {'jaw': [list(range(0, 33))],
+                        'eyebrow': [list(range(33, 42)), list(range(42, 51))],
+                        'nose': [list(range(51, 66))],
+                        'eye': [list(range(66, 75)), list(range(75, 84))],
+                        'mouth': [list(range(84, 104))]}
+
+    lapa_train_names = []
+    lapa_val_names = []
+
+    for split_name in ['train', 'val']:  # we're not using the test set (at least for now)
+        path_lapa_images = os.path.join(path_lapa_dataset, split_name, "images")
+        path_lapa_landmarks = os.path.join(path_lapa_dataset, split_name, "landmarks")
+        split_images = os.listdir(path_lapa_images)
+        if split_name == 'train':
+            split_images = [f for f in split_images if not any([n in f for n in exclude_prefix])]
+
+        for img_name in split_images:
+
+            img_source = os.path.join(path_lapa_images, img_name)
+            img_dest = os.path.join(path_processed_images, img_name)
+            shutil.copy(img_source, img_dest)
+
+            img = cv2.imread(img_source, cv2.IMREAD_COLOR)
+            img_h, img_w = img.shape[:2]
+            img, ratio = smart_resize(img)
+
+            img_landmarks = os.path.join(path_lapa_landmarks, img_name.split(".")[0] + ".txt")
+            img_labels = pd.DataFrame(columns=['class', 'x', 'y', 'w', 'h'])
+            with open(img_landmarks) as f:
+                lines = [l.rstrip() for l in f.readlines()]
+                num_landmarks = lines[0]
+                lines = lines[1:]  # excluding the first line
+                print("[LaPa] {}: {} landmarks".format(img_name, num_landmarks))
+
+                for part_id, part_name in enumerate(use_parts):
+                    for idxs in part_points_lapa[part_name]:
+                        part_points = [lines[i] for i in idxs]
+                        contour = []
+                        for i, p in enumerate(part_points):
+                            x, y = [float(c) for c in p.split(" ")]
+                            contour.append([x, y])
+                            img = cv2.circle(img, (int(x * ratio), int(y * ratio)), 3, (0, 255, 255), -1)
+
+                        # Getting the bounding box in YOLO format
+                        x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
+
+                        # Showing the box
+                        img = cv2.rectangle(img,
+                                            (int(x*ratio), int(y*ratio)),
+                                            (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
+
+                cv2.imshow("Image", img)
+                cv2.waitKey(IMSHOW_WAIT_TIME)
+
+            label_name = os.path.splitext(img_name)[0]
+            label_dest = os.path.join(path_processed_labels, "{}.txt".format(label_name))
+            img_labels.round(6).to_csv(label_dest, header=False, index=False, sep=" ")
+
+            if split_name == 'train':
+                lapa_train_names.append(label_name)
+            else:
+                lapa_val_names.append(label_name)
+
+    lapa_train_names = pd.DataFrame({0: lapa_train_names})
+    lapa_val_names = pd.DataFrame({0: lapa_val_names})
+
     ##################################
-    # PART 5: CREATING THE YAML FILE #
+    # PART 6: CREATING THE YAML FILE #
     ##################################
 
     # Using the original Helen splits (test will be used for validation) and adding the Pexels and AFW splits
@@ -341,14 +426,16 @@ if __name__ == "__main__":
     train_names = pd.concat([train_names,
                              pexels_train_names,
                              afw_train_names,
-                             menpo2D_train_names], ignore_index=True)
+                             menpo2D_train_names,
+                             lapa_train_names], ignore_index=True)
     process_names(train_names, "train", path_processed_dataset, path_yolo_data, skip_helen_ids)
 
     test_names = pd.read_csv(os.path.join(path_helen_dataset, 'testnames.txt'), header=None)
     test_names = pd.concat([test_names,
                             pexels_val_names,
                             afw_val_names,
-                            menpo2D_test_names], ignore_index=True)
+                            menpo2D_test_names,
+                            lapa_val_names], ignore_index=True)
     process_names(test_names, "val", path_processed_dataset, path_yolo_data, skip_helen_ids)
 
     # Creating the YAML file for training
@@ -361,4 +448,4 @@ if __name__ == "__main__":
                 'names': {i: p for i, p in enumerate(use_parts)}}
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
 
-    print("Done!")
+    print("\nDone!")
