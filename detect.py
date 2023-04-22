@@ -1,15 +1,21 @@
 from ultralytics import YOLO
 import os
 import cv2
+import argparse
 import supervision as spv
 
 
 if __name__ == "__main__":
 
-    # Testing the nano model
-    path_model = os.path.join("runs", "detect", "train_n", "weights")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", '--model_dir', type=str, help="Path to the model weights")
+    args = parser.parse_args()
 
-    # Creating the model
+    # Loading the model
+    if args.data_dir is not None:
+        path_model = args.model_dir
+    else:
+        path_model = path_model = os.path.join("runs", "detect", "train_n", "weights")
     model = YOLO(os.path.join(path_model, "best.pt"))
 
     # This will draw the detections
