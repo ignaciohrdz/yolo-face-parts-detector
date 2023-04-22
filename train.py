@@ -1,18 +1,27 @@
 from ultralytics import YOLO
 import os
+import argparse
 from utils import *
 
 
 if __name__ == "__main__":
 
-    path_dataset = os.path.join(PATH_HOME, "Documents", "Datasets", "Face-Parts-Dataset")
-    path_yaml = os.path.join(path_dataset, "split", "data.yaml")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", '--data_dir', type=str, help="Path to the datasets folder")
+    args = parser.parse_args()
+    if args.data_dir is not None:
+        path_datasets = args.data_dir
+    else:
+        path_datasets = os.path.join(PATH_HOME, "Documents", "Datasets")
 
-    # Creating the model
-    model = YOLO("weights/yolov8n.pt")
+    path_face_parts = os.path.join(path_datasets, "Face-Parts-Dataset")
+    path_yaml = os.path.join(path_face_parts, "split", "data.yaml")
 
-    # Train the model
-    results = model.train(data=path_yaml, task="detect", name="train",
-                          epochs=10, workers=4, batch=8,
-                          scale=0.25, degrees=25.0, mosaic=0.8)
+    # Training all models
+    for m in ['n', 's', 'm', 'l', 'x']:
+        model = YOLO("weights/yolov8{}.pt".format(m))
 
+        # Train the model
+        results = model.train(data=path_yaml, task="detect", name="train_{}".format(m),
+                              epochs=10, workers=4, batch=8,
+                              scale=0.25, degrees=25.0, mosaic=0.8)

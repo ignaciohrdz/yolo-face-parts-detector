@@ -46,12 +46,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", '--data_dir', type=str, help="Path to the folder with all the datasets to be combined")
+    parser.add_argument('--no_show', action='store_true', help="Disable cv2.imshow")
     args = parser.parse_args()
     if args.data_dir is not None:
         path_datasets = args.data_dir
     else:
         path_datasets = os.path.join(PATH_HOME, "Documents", "Datasets")
 
+    SHOW_IMAGES = not args.no_show
     IMSHOW_WAIT_TIME = 33  # for cv2.imshow
 
     # Original data from Helen
@@ -131,8 +133,9 @@ if __name__ == "__main__":
             img_h, img_w = img.shape[:2]
             img, ratio = smart_resize(img)
 
-            cv2.imshow("Image", img)
-            cv2.waitKey(IMSHOW_WAIT_TIME)
+            if SHOW_IMAGES:
+                cv2.imshow("Image", img)
+                cv2.waitKey(IMSHOW_WAIT_TIME)
 
             # Converting each face part into a bounding box (using the YOLO format)
             img_labels = pd.DataFrame(columns=['class', 'x', 'y', 'w', 'h'])
@@ -152,8 +155,9 @@ if __name__ == "__main__":
                                         (int(x*ratio), int(y*ratio)),
                                         (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
 
-            cv2.imshow("Image", img)
-            cv2.waitKey(IMSHOW_WAIT_TIME)
+            if SHOW_IMAGES:
+                cv2.imshow("Image", img)
+                cv2.waitKey(IMSHOW_WAIT_TIME)
 
             # Saving the data
             img_source = os.path.join(path_helen_images, img_name)
@@ -235,8 +239,9 @@ if __name__ == "__main__":
                 img_h, img_w = img.shape[:2]
                 img, ratio = smart_resize(img)
 
-                cv2.imshow("Image", img)
-                cv2.waitKey(IMSHOW_WAIT_TIME)
+                if SHOW_IMAGES:
+                    cv2.imshow("Image", img)
+                    cv2.waitKey(IMSHOW_WAIT_TIME)
                 print("[AFW] {}: {} landmarks".format(n, len(lines)))
 
             img_labels = pd.DataFrame(columns=['class', 'x', 'y', 'w', 'h'])
@@ -257,8 +262,9 @@ if __name__ == "__main__":
                                         (int(x*ratio), int(y*ratio)),
                                         (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
 
-            cv2.imshow("Image", img)
-            cv2.waitKey(IMSHOW_WAIT_TIME)
+            if SHOW_IMAGES:
+                cv2.imshow("Image", img)
+                cv2.waitKey(IMSHOW_WAIT_TIME)
 
             label_dest = os.path.join(path_processed_labels, "{}.txt".format(n))
             img_labels.round(6).to_csv(label_dest, header=False, index=False, sep=" ")
@@ -313,8 +319,9 @@ if __name__ == "__main__":
             img_h, img_w = img.shape[:2]
             img, ratio = smart_resize(img)
 
-            cv2.imshow("Image", img)
-            cv2.waitKey(IMSHOW_WAIT_TIME)
+            if SHOW_IMAGES:
+                cv2.imshow("Image", img)
+                cv2.waitKey(IMSHOW_WAIT_TIME)
             print("[Menpo2D] {}: {} landmarks".format(os.path.basename(img_path), len(x_points)))
 
             img_labels = pd.DataFrame(columns=['class', 'x', 'y', 'w', 'h'])
@@ -336,8 +343,9 @@ if __name__ == "__main__":
                                         (int(x*ratio), int(y*ratio)),
                                         (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
 
-            cv2.imshow("Image", img)
-            cv2.waitKey(IMSHOW_WAIT_TIME)
+            if SHOW_IMAGES:
+                cv2.imshow("Image", img)
+                cv2.waitKey(IMSHOW_WAIT_TIME)
 
             label_name = os.path.splitext(os.path.basename(img_path))[0]
             label_dest = os.path.join(path_processed_labels, "{}.txt".format(label_name))
@@ -400,8 +408,9 @@ if __name__ == "__main__":
                                             (int(x*ratio), int(y*ratio)),
                                             (int((x+w)*ratio), int((y+h)*ratio)), (0, 0, 255), 2)
 
-                cv2.imshow("Image", img)
-                cv2.waitKey(IMSHOW_WAIT_TIME)
+                if SHOW_IMAGES:
+                    cv2.imshow("Image", img)
+                    cv2.waitKey(IMSHOW_WAIT_TIME)
 
             label_name = os.path.splitext(img_name)[0]
             label_dest = os.path.join(path_processed_labels, "{}.txt".format(label_name))

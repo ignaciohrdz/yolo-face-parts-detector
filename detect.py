@@ -6,7 +6,8 @@ import supervision as spv
 
 if __name__ == "__main__":
 
-    path_model = os.path.join("runs", "detect", "train", "weights")
+    # Testing the nano model
+    path_model = os.path.join("runs", "detect", "train_n", "weights")
 
     # Creating the model
     model = YOLO(os.path.join(path_model, "best.pt"))
