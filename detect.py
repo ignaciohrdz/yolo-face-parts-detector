@@ -12,7 +12,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Loading the model
-    if args.data_dir is not None:
+    if args.model_dir is not None:
         path_model = args.model_dir
     else:
         path_model = path_model = os.path.join("runs", "detect", "train_n", "weights")

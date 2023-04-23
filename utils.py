@@ -23,5 +23,5 @@ def points_to_YOLO(labels_df, points, part_id, img_h, img_w):
     labels_df.loc[len(labels_df), :] = [part_id, x_c, y_c, w_n, h_n]
     return x, y, w, h  # these are not the normalised coordinates, these are for plotting the box
 
-
+# Resolve the home path. In Windows, I assume you are using WSL
 PATH_HOME = Path.home() if not platform.system() == "Linux" else "/mnt/c/Users/{}".format(getpass.getuser())

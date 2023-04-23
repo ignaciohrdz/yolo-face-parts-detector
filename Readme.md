@@ -16,7 +16,7 @@ For this experiment I'm using the following sources:
   - [AFW (Annotated Faces in the Wild)](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
   - [LaPa dataset](https://github.com/JDAI-CV/lapa-dataset)
 - Custom datasets:
-  - [Pexels](https://pexels.com): I downloaded 85 images from this website and annotated them using [CVAT](https://app.cvat.ai/). I am currently working on another two batches of images.
+  - [Pexels](https://pexels.com): I downloaded 257 images from this website and annotated them using [CVAT](https://app.cvat.ai/). As of today, I've annotated four batches of images, and I've tried to include pictures where parts of the face are missing.
 
 ## Results
 
