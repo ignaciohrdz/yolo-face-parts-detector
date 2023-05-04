@@ -13,8 +13,9 @@ For this experiment I'm using the following sources:
 - Existing datasets: all these datasets were processed by converting each group of facial landmarks (eye, mouth, nose, eyebrows) to a bounding box compatible with YOLO.
   - [Helen dataset](http://www.ifp.illinois.edu/~vuongle2/helen/)
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
-  - [AFW (Annotated Faces in the Wild)](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
-  - [LaPa dataset](https://github.com/JDAI-CV/lapa-dataset)
+  - [AFW (Annotated Faces in the Wild) dataset](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
+  - [LaPa (Landmark-guided face Parsing) dataset](https://github.com/JDAI-CV/lapa-dataset)
+  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository) (Work in progress)
 - Custom datasets:
   - [Pexels](https://pexels.com): I downloaded 257 images from this website and annotated them using [CVAT](https://app.cvat.ai/). As of today, I've annotated four batches of images, and I've tried to include pictures where parts of the face are missing.
 
