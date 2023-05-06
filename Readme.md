@@ -6,6 +6,8 @@ In this project I use the most recent implementation of YOLO by Ultralytics, [YO
 
 It is also a great opportunity to try out the `supervision` library by [Roboflow](https://github.com/roboflow/supervision). Despite it's still in beta, it looks really helpful for some common YOLO-related tasks such as drawing the detections.
 
+![A live demo of YOLOv8 nano](images/live_demo.gif)
+
 ## Data
 
 For this experiment I'm using the following sources:
@@ -15,7 +17,7 @@ For this experiment I'm using the following sources:
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
   - [AFW (Annotated Faces in the Wild) dataset](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
   - [LaPa (Landmark-guided face Parsing) dataset](https://github.com/JDAI-CV/lapa-dataset)
-  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository) (Work in progress)
+  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): This one is tricky, but I'm working on it.
 - Custom datasets:
   - [Pexels](https://pexels.com): I downloaded 257 images from this website and annotated them using [CVAT](https://app.cvat.ai/). As of today, I've annotated four batches of images, and I've tried to include pictures where parts of the face are missing.
 
