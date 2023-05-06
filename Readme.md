@@ -31,6 +31,11 @@ Some datasets such as Helen may generate noisy examples when the images have mor
 
 ### Performance
 
-The model I've trained (nano) struggles with eyebrows, but it works really well on eyes and noses. I need to add more close-up images of each part to increase the number of incomplete faces.
+The model I've trained (_nano_) struggles with eyebrows, but it works really well on eyes and noses. I need to add more close-up images of each part to increase the number of incomplete or occluded faces.
 
-![F1 curve](images/F1_curve.png)
+![Yolov8-nano F1 curve](images/F1_curve.png)
+
+Here are the metrics for the _nano_ model:
+
+![YOLOv8-nano results](images/results.png)
+
