@@ -12,7 +12,8 @@ It is also a great opportunity to try out the `supervision` library by [Roboflow
 
 All I want these models for is data exploration and check what face parts can be seen in an image. Note that I'm talking about detecting _face parts_, which is not the same as detecting _faces_. I've been asked many times: why not using facial landmark detectors? And the reason is that these do not work well with close-up images, like this one:
 
-![An example of a close-up image where facial landmark detection is not possible](https://images.pexels.com/photos/977601/pexels-photo-977601.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)
+![An example of a close-up image where facial landmark detection is not possible](images/closeup_example.jpg)
+_Image source: [Pexels](https://images.pexels.com/photos/977601/pexels-photo-977601.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)_
 
 I know there are several works about facial landmark detection for occluded faces (such as ["Robust face landmark estimation under occlusion"](https://pdollar.github.io/files/papers/BurgosArtizzuICCV13rcpr.pdf)), but a picture of the entire face is always needed. If I wanted to be able to detect face parts in close-up images, I would have to develop something new. And that's what I've done.
 
