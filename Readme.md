@@ -51,3 +51,7 @@ Here are the metrics of the _nano_ model:
 
 ![YOLOv8-nano results](images/results.png)
 
+## Reports
+
+Use `run.py` to run the model on a folder with images to obtain a CSV with all the detections.
+
