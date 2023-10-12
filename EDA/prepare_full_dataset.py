@@ -78,8 +78,6 @@ if __name__ == "__main__":
 
     # Original data from the FASSEG dataset
     path_fasseg_dataset = os.path.join(path_datasets, "FASSEG", "joined-V2-V3")
-    path_fasseg_dataset_V2 = os.path.join(path_fasseg_dataset, "V2")
-    path_fasseg_dataset_V3 = os.path.join(path_fasseg_dataset, "V3")
 
     # The results will go here
     path_processed_dataset = Path(os.path.join(path_datasets, "Face-Parts-Dataset"))
