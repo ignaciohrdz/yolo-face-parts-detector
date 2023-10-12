@@ -20,15 +20,15 @@ I know there are several works about facial landmark detection for occluded face
 
 ## Data
 
-For this experiment I'm using a variety of facial landmark detection datasets. Each dataset came in a different structure, so I had to deal with that in `prepare_data.py`:
+For this experiment I'm using a variety of facial landmark detection datasets. Each dataset came in a different structure, so I had to deal with that in `prepare_full_dataset.py`:
 
-- Existing datasets: all these datasets were processed by converting each group of facial landmarks (eye, mouth, nose, eyebrows) to a bounding box compatible with YOLO.
+- **Existing datasets**: all these datasets were processed by converting each group of facial landmarks (eye, mouth, nose, eyebrows) to a bounding box compatible with YOLO.
   - [Helen dataset](http://www.ifp.illinois.edu/~vuongle2/helen/)
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
   - [AFW (Annotated Faces in the Wild) dataset](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
   - [LaPa (Landmark-guided face Parsing) dataset](https://github.com/JDAI-CV/lapa-dataset)
-  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): This one is tricky, but I'm working on it.
-- Custom datasets:
+  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): The original labels consider eyebrows and hair as a single class (hair), so I manually annotated subsets V2 and V3. This dataset includes many low-quality profile images, and it will probably improve performance.
+- **Custom datasets**:
   - [Pexels](https://pexels.com): I downloaded 257 images from this website and annotated them using [CVAT](https://app.cvat.ai/). As of today, I've annotated four batches of images, and I've tried to include pictures where parts of the face are missing.
 
 **I am not sharing any of these datasets**: they are not mine and they are 100% accessible from their corresponding sites. I may release the Pexels dataset that I create, though.

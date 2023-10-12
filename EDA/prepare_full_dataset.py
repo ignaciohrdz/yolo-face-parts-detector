@@ -9,6 +9,7 @@ Author: Ignacio Hernández Montilla, 2023
 from utils import *
 import shutil
 import glob
+from pathlib import Path
 from unidecode import unidecode
 
 import pandas as pd
@@ -21,7 +22,7 @@ import random
 random.seed(420)
 
 
-def process_names(names, split, path_data, path_dest, skip):
+def process_names(names, split, path_data, path_dest, skip=[]):
     """
     This function reads the split data of all datasets
      and saves it following the YOLO folder structure
@@ -32,9 +33,9 @@ def process_names(names, split, path_data, path_dest, skip):
     :param skip: list of image names that we may want to skip
     :return: None
     """
-    names[1] = names[0].apply(lambda x: os.path.join(path_data, "images", x + ".jpg"))
+    names[1] = names[0].apply(lambda x: os.path.join(path_data, "../images", x + ".jpg"))
     names[2] = names[0].apply(lambda x: os.path.join(path_data, "labels", x + ".txt"))
-    path_imgs_txt = os.path.join(path_dest, "images", split, "images.txt")
+    path_imgs_txt = os.path.join(path_dest, "../images", split, "images.txt")
     path_labels_txt = os.path.join(path_dest, "labels", split, "labels.txt")
     use_imgs = names.loc[~names[0].isin(skip), 1]
     use_labels = names.loc[~names[0].isin(skip), 2]
@@ -51,14 +52,16 @@ if __name__ == "__main__":
     if args.data_dir is not None:
         path_datasets = args.data_dir
     else:
-        path_datasets = os.path.join(PATH_HOME, "Documents", "Datasets")
+        path_datasets = os.path.join(Path.home(), "Documents", "Datasets")
 
     SHOW_IMAGES = not args.no_show
     IMSHOW_WAIT_TIME = 33  # for cv2.imshow
 
     # Original data from Helen
+    # I downloaded all the images and put them in an 'images' folder
+    # Same for the annotations, but in the 'annotation' folder
     path_helen_dataset = os.path.join(path_datasets, "Helen-dataset")
-    path_helen_images = os.path.join(path_helen_dataset, "images")
+    path_helen_images = os.path.join(path_helen_dataset, "../images")
     path_helen_annotations = os.path.join(path_helen_dataset, "annotation")
 
     # Original data from Pexels
@@ -73,12 +76,17 @@ if __name__ == "__main__":
     # Original data from the LaPa dataset
     path_lapa_dataset = os.path.join(path_datasets, "LaPa")
 
+    # Original data from the FASSEG dataset
+    path_fasseg_dataset = os.path.join(path_datasets, "FASSEG", "joined-V2-V3")
+    path_fasseg_dataset_V2 = os.path.join(path_fasseg_dataset, "V2")
+    path_fasseg_dataset_V3 = os.path.join(path_fasseg_dataset, "V3")
+
     # The results will go here
     path_processed_dataset = Path(os.path.join(path_datasets, "Face-Parts-Dataset"))
-    path_processed_images = Path(os.path.join(path_processed_dataset, "images"))
+    path_processed_images = Path(os.path.join(path_processed_dataset, "../images"))
     path_processed_labels = Path(os.path.join(path_processed_dataset, "labels"))
     path_yolo_data = Path(os.path.join(path_processed_dataset, "split"))
-    path_yolo_images = Path(os.path.join(path_yolo_data, "images"))
+    path_yolo_images = Path(os.path.join(path_yolo_data, "../images"))
     path_yolo_labels = Path(os.path.join(path_yolo_data, "labels"))
 
     # Create the YOLO folders if they don't exist
@@ -149,7 +157,7 @@ if __name__ == "__main__":
                         img = cv2.circle(img, (int(x*ratio), int(y*ratio)), 3, (0, 255, 255), -1)
 
                     # Getting the bounding box in YOLO format
-                    x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
+                    x, y, w, h = points_to_yolo(img_labels, contour, part_id, img_h, img_w)
 
                     img = cv2.rectangle(img,
                                         (int(x*ratio), int(y*ratio)),
@@ -175,7 +183,7 @@ if __name__ == "__main__":
     pexels_names = []
     for s in pexels_sets:
         path_pexels_annotations = os.path.join(path_pexels_dataset, s, "annotations", "obj_train_data")
-        path_pexels_images = os.path.join(path_pexels_dataset, s, "images")
+        path_pexels_images = os.path.join(path_pexels_dataset, s, "../images")
         pexels_labels = os.listdir(path_pexels_annotations)
 
         for l in pexels_labels:
@@ -192,7 +200,7 @@ if __name__ == "__main__":
             label_dest = os.path.join(path_processed_labels, file_name_cleaned + ".txt")
             shutil.copy(label_source, label_dest)
 
-    # Separate the Helen dataset in training and validation
+    # Separate the Pexels dataset in training and validation
     train_pct = 0.7
     random.shuffle(pexels_names)
     train_size = int(train_pct*len(pexels_names))
@@ -255,7 +263,7 @@ if __name__ == "__main__":
                         img = cv2.circle(img, (int(x * ratio), int(y * ratio)), 3, (0, 255, 255), -1)
 
                     # Getting the bounding box in YOLO format
-                    x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
+                    x, y, w, h = points_to_yolo(img_labels, contour, part_id, img_h, img_w)
 
                     # Showing the box
                     img = cv2.rectangle(img,
@@ -336,7 +344,7 @@ if __name__ == "__main__":
                         img = cv2.circle(img, (int(x * ratio), int(y * ratio)), 3, (0, 255, 255), -1)
 
                     # Getting the bounding box in YOLO format
-                    x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
+                    x, y, w, h = points_to_yolo(img_labels, contour, part_id, img_h, img_w)
 
                     # Showing the box
                     img = cv2.rectangle(img,
@@ -367,7 +375,7 @@ if __name__ == "__main__":
     lapa_val_names = []
 
     for split_name in ['train', 'val']:  # we're not using the test set (at least for now)
-        path_lapa_images = os.path.join(path_lapa_dataset, split_name, "images")
+        path_lapa_images = os.path.join(path_lapa_dataset, split_name, "../images")
         path_lapa_landmarks = os.path.join(path_lapa_dataset, split_name, "landmarks")
         split_images = os.listdir(path_lapa_images)
         if split_name == 'train':
@@ -401,7 +409,7 @@ if __name__ == "__main__":
                             img = cv2.circle(img, (int(x * ratio), int(y * ratio)), 3, (0, 255, 255), -1)
 
                         # Getting the bounding box in YOLO format
-                        x, y, w, h = points_to_YOLO(img_labels, contour, part_id, img_h, img_w)
+                        x, y, w, h = points_to_yolo(img_labels, contour, part_id, img_h, img_w)
 
                         # Showing the box
                         img = cv2.rectangle(img,
@@ -424,8 +432,37 @@ if __name__ == "__main__":
     lapa_train_names = pd.DataFrame({0: lapa_train_names})
     lapa_val_names = pd.DataFrame({0: lapa_val_names})
 
+    ##########################################################
+    # PART 6: PROCESS THE FASSEG DATASET (subsets V2 and V3) #
+    ##########################################################
+
+    fasseg_names = []
+    path_fasseg_annotations = os.path.join(path_fasseg_dataset, "annotations", "obj_train_data")
+    path_fasseg_images = os.path.join(path_fasseg_dataset, "../images")
+    fasseg_labels = os.listdir(path_fasseg_annotations)
+
+    for l in fasseg_labels:
+        file_name = os.path.splitext(l)[0]
+        fasseg_names.append(file_name)
+
+        img_name = file_name + ".bmp"
+        img_source = os.path.join(path_fasseg_images, img_name)
+        img_dest = os.path.join(path_processed_images, file_name + ".bmp")
+        shutil.copy(img_source, img_dest)
+
+        label_source = os.path.join(path_fasseg_annotations, l)
+        label_dest = os.path.join(path_processed_labels, file_name + ".txt")
+        shutil.copy(label_source, label_dest)
+
+    # Separate the FASSEG dataset in training and validation
+    fasseg_splits = pd.read_csv(os.path.join(path_fasseg_dataset / "split_info.csv"))
+    fasseg_train_names = fasseg_splits.loc[fasseg_splits.is_train == 1, 'image'].to_list()
+    fasseg_val_names = fasseg_splits.loc[fasseg_splits.is_train == 0, 'image'].to_list()
+    fasseg_train_names = pd.DataFrame({0: fasseg_train_names})
+    fasseg_val_names = pd.DataFrame({0: fasseg_val_names})
+
     ##################################
-    # PART 6: CREATING THE YAML FILE #
+    # PART 7: CREATING THE YAML FILE #
     ##################################
 
     # Using the original Helen splits (test will be used for validation) and adding the Pexels and AFW splits
@@ -436,7 +473,8 @@ if __name__ == "__main__":
                              pexels_train_names,
                              afw_train_names,
                              menpo2D_train_names,
-                             lapa_train_names], ignore_index=True)
+                             lapa_train_names,
+                             fasseg_train_names], ignore_index=True)
     process_names(train_names, "train", path_processed_dataset, path_yolo_data, skip_helen_ids)
 
     test_names = pd.read_csv(os.path.join(path_helen_dataset, 'testnames.txt'), header=None)
@@ -444,15 +482,16 @@ if __name__ == "__main__":
                             pexels_val_names,
                             afw_val_names,
                             menpo2D_test_names,
-                            lapa_val_names], ignore_index=True)
+                            lapa_val_names,
+                            fasseg_val_names], ignore_index=True)
     process_names(test_names, "val", path_processed_dataset, path_yolo_data, skip_helen_ids)
 
     # Creating the YAML file for training
     # Make sure that the class IDs are the same for all datasets! (i.e. 'eye' is class 0 in all datasets)
     with open(os.path.join(path_yolo_data, 'data.yaml'), 'w') as f:
         data = {'path': str(path_yolo_data),
-                'train': os.path.join("images", "train", "images.txt"),
-                'val': os.path.join("images", "val", "images.txt"),
+                'train': os.path.join("../images", "train", "images.txt"),
+                'val': os.path.join("../images", "val", "images.txt"),
                 'test': '',
                 'names': {i: p for i, p in enumerate(use_parts)}}
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
