@@ -5,7 +5,7 @@ The output of this code is a folder with everything needed to train a YOLOv8 mod
 
 Author: Ignacio Hernández Montilla, 2023
 """
-
+import os
 from utils import *
 import shutil
 import glob
@@ -13,7 +13,6 @@ from pathlib import Path
 from unidecode import unidecode
 
 import pandas as pd
-import os
 import yaml
 
 import argparse
@@ -33,9 +32,9 @@ def process_names(names, split, path_data, path_dest, skip=[]):
     :param skip: list of image names that we may want to skip
     :return: None
     """
-    names[1] = names[0].apply(lambda x: os.path.join(path_data, "../images", x + ".jpg"))
+    names[1] = names[0].apply(lambda x: os.path.join(path_data, "images", x + ".jpg"))
     names[2] = names[0].apply(lambda x: os.path.join(path_data, "labels", x + ".txt"))
-    path_imgs_txt = os.path.join(path_dest, "../images", split, "images.txt")
+    path_imgs_txt = os.path.join(path_dest, "images", split, "images.txt")
     path_labels_txt = os.path.join(path_dest, "labels", split, "labels.txt")
     use_imgs = names.loc[~names[0].isin(skip), 1]
     use_labels = names.loc[~names[0].isin(skip), 2]
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     # I downloaded all the images and put them in an 'images' folder
     # Same for the annotations, but in the 'annotation' folder
     path_helen_dataset = os.path.join(path_datasets, "Helen-dataset")
-    path_helen_images = os.path.join(path_helen_dataset, "../images")
+    path_helen_images = os.path.join(path_helen_dataset, "images")
     path_helen_annotations = os.path.join(path_helen_dataset, "annotation")
 
     # Original data from Pexels
@@ -81,10 +80,10 @@ if __name__ == "__main__":
 
     # The results will go here
     path_processed_dataset = Path(os.path.join(path_datasets, "Face-Parts-Dataset"))
-    path_processed_images = Path(os.path.join(path_processed_dataset, "../images"))
+    path_processed_images = Path(os.path.join(path_processed_dataset, "images"))
     path_processed_labels = Path(os.path.join(path_processed_dataset, "labels"))
     path_yolo_data = Path(os.path.join(path_processed_dataset, "split"))
-    path_yolo_images = Path(os.path.join(path_yolo_data, "../images"))
+    path_yolo_images = Path(os.path.join(path_yolo_data, "images"))
     path_yolo_labels = Path(os.path.join(path_yolo_data, "labels"))
 
     # Create the YOLO folders if they don't exist
@@ -181,7 +180,7 @@ if __name__ == "__main__":
     pexels_names = []
     for s in pexels_sets:
         path_pexels_annotations = os.path.join(path_pexels_dataset, s, "annotations", "obj_train_data")
-        path_pexels_images = os.path.join(path_pexels_dataset, s, "../images")
+        path_pexels_images = os.path.join(path_pexels_dataset, s, "images")
         pexels_labels = os.listdir(path_pexels_annotations)
 
         for l in pexels_labels:
@@ -373,7 +372,7 @@ if __name__ == "__main__":
     lapa_val_names = []
 
     for split_name in ['train', 'val']:  # we're not using the test set (at least for now)
-        path_lapa_images = os.path.join(path_lapa_dataset, split_name, "../images")
+        path_lapa_images = os.path.join(path_lapa_dataset, split_name, "images")
         path_lapa_landmarks = os.path.join(path_lapa_dataset, split_name, "landmarks")
         split_images = os.listdir(path_lapa_images)
         if split_name == 'train':
@@ -436,7 +435,7 @@ if __name__ == "__main__":
 
     fasseg_names = []
     path_fasseg_annotations = os.path.join(path_fasseg_dataset, "annotations", "obj_train_data")
-    path_fasseg_images = os.path.join(path_fasseg_dataset, "../images")
+    path_fasseg_images = os.path.join(path_fasseg_dataset, "images")
     fasseg_labels = os.listdir(path_fasseg_annotations)
 
     for l in fasseg_labels:
@@ -453,7 +452,7 @@ if __name__ == "__main__":
         shutil.copy(label_source, label_dest)
 
     # Separate the FASSEG dataset in training and validation
-    fasseg_splits = pd.read_csv(os.path.join(path_fasseg_dataset / "split_info.csv"))
+    fasseg_splits = pd.read_csv(os.path.join(path_fasseg_dataset, "split_info.csv"))
     fasseg_train_names = fasseg_splits.loc[fasseg_splits.is_train == 1, 'image'].to_list()
     fasseg_val_names = fasseg_splits.loc[fasseg_splits.is_train == 0, 'image'].to_list()
     fasseg_train_names = pd.DataFrame({0: fasseg_train_names})
@@ -488,8 +487,8 @@ if __name__ == "__main__":
     # Make sure that the class IDs are the same for all datasets! (i.e. 'eye' is class 0 in all datasets)
     with open(os.path.join(path_yolo_data, 'data.yaml'), 'w') as f:
         data = {'path': str(path_yolo_data),
-                'train': os.path.join("../images", "train", "images.txt"),
-                'val': os.path.join("../images", "val", "images.txt"),
+                'train': os.path.join("images", "train", "images.txt"),
+                'val': os.path.join("images", "val", "images.txt"),
                 'test': '',
                 'names': {i: p for i, p in enumerate(use_parts)}}
         yaml.dump(data, f, default_flow_style=False, sort_keys=False)
